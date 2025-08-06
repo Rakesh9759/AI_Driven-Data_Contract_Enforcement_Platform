@@ -1,0 +1,5 @@
+{
+  "app_name": "idprp-ai-data-platform",
+  "environment": "dev",
+  "log_level": "INFO"
+}
