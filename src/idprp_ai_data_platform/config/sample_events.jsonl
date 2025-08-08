@@ -1,0 +1,3 @@
+{"event_id":"evt-001","source":"simulator","latency_ms":121,"status":"ok"}
+{"event_id":"evt-002","source":"simulator","latency_ms":138,"status":"ok"}
+{"event_id":"evt-003","source":"simulator","latency_ms":201,"status":"warn"}

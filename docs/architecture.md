@@ -13,7 +13,7 @@ Build an incremental, production-grade data reliability platform with clear modu
 ## Baseline Module Layout
 - src/idprp_ai_data_platform/common: shared config, logging, and exception utilities.
 - src/idprp_ai_data_platform/config: environment-driven runtime configuration.
-- src/docs: architecture and problem framing docs tracked as part of Phase 0.
+- docs: architecture and problem framing docs tracked as part of Phase 0.
 
 ## Design Principles
 - Config-driven behavior over hardcoded runtime values.
