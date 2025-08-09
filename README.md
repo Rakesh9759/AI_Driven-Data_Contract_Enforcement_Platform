@@ -19,6 +19,7 @@ This commit establishes a src-first scaffold, baseline configuration and logging
 |   `-- idprp_ai_data_platform/
 |       |-- common/
 |       |-- config/
+|       |-- ingestion/
 |       `-- main.py
 `-- README.md
 ```
@@ -37,6 +38,12 @@ python -m idprp_ai_data_platform.main
 ```powershell
 $env:PYTHONPATH = "src"
 python -m idprp_ai_data_platform.main --sample-data src/idprp_ai_data_platform/config/sample_events.jsonl
+```
+
+## Generate Simulator Data (Phase 1)
+```powershell
+$env:PYTHONPATH = "src"
+python -m idprp_ai_data_platform.ingestion.simulators.generate_samples --count 10 --output project_files/generated/simulator_events.jsonl
 ```
 
 ## Operations Docs
