@@ -13,13 +13,16 @@ class MetricsSimulator:
 
     seed: int = 11
     source_system: str = "metrics-simulator"
+    reference_time: datetime | None = None
 
     def generate(self, count: int) -> list[dict[str, object]]:
         if count <= 0:
             raise ValueError("count must be greater than zero")
 
         rng = Random(self.seed)
-        now = datetime.now(tz=timezone.utc)
+        now = self.reference_time or datetime.now(tz=timezone.utc)
+        if now.tzinfo is None:
+            now = now.replace(tzinfo=timezone.utc)
         rows: list[dict[str, object]] = []
         for idx in range(count):
             event_time = now - timedelta(seconds=idx * 10)

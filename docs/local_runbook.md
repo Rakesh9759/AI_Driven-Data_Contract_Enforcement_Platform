@@ -31,6 +31,19 @@ python -m idprp_ai_data_platform.ingestion.simulators.generate_samples --count 1
 python -m idprp_ai_data_platform.main --sample-data project_files/generated/simulator_events.jsonl
 ```
 
+## Run Simulator Tests
+```powershell
+$env:PYTHONPATH = "src"
+python -m unittest discover -s src/idprp_ai_data_platform/ingestion/simulators/tests -p "test_*.py"
+```
+
+## Validate Curated Datasets
+```powershell
+$env:PYTHONPATH = "src"
+python -m idprp_ai_data_platform.main --sample-data src/idprp_ai_data_platform/config/datasets/simulator_clean_sample.jsonl
+python -m idprp_ai_data_platform.main --sample-data src/idprp_ai_data_platform/config/datasets/simulator_drifted_sample.jsonl
+```
+
 Expected result:
 - Structured JSON logs printed to stdout
 - "Sample data processed successfully" event emitted with rows_processed
