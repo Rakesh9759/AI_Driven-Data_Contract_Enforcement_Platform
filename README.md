@@ -46,6 +46,12 @@ $env:PYTHONPATH = "src"
 python -m idprp_ai_data_platform.ingestion.simulators.generate_samples --count 10 --output project_files/generated/simulator_events.jsonl
 ```
 
+## Kafka Producer Integration (Phase 2)
+```powershell
+$env:PYTHONPATH = "src"
+python -m idprp_ai_data_platform.ingestion.kafka.produce_from_jsonl --input project_files/generated/simulator_events.jsonl --config src/idprp_ai_data_platform/config/app_config.json --mock-output project_files/generated/kafka_events.jsonl
+```
+
 ## Run Simulator Test Suite (Phase 1)
 ```powershell
 $env:PYTHONPATH = "src"

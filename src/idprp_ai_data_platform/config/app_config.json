@@ -1,5 +1,11 @@
 {
   "app_name": "idprp-ai-data-platform",
   "environment": "dev",
-  "log_level": "INFO"
+  "log_level": "INFO",
+  "kafka": {
+    "bootstrap_servers": "localhost:9092",
+    "topic": "telemetry-events",
+    "client_id": "idprp-producer",
+    "mock_output_path": "project_files/generated/kafka_events.jsonl"
+  }
 }

@@ -37,6 +37,13 @@ $env:PYTHONPATH = "src"
 python -m unittest discover -s src/idprp_ai_data_platform/ingestion/simulators/tests -p "test_*.py"
 ```
 
+## Publish Events Through Kafka Producer Adapter
+```powershell
+$env:PYTHONPATH = "src"
+python -m idprp_ai_data_platform.ingestion.simulators.generate_samples --count 12 --output project_files/generated/simulator_events_phase2.jsonl
+python -m idprp_ai_data_platform.ingestion.kafka.produce_from_jsonl --input project_files/generated/simulator_events_phase2.jsonl --config src/idprp_ai_data_platform/config/app_config.json --mock-output project_files/generated/kafka_events_phase2.jsonl
+```
+
 ## Validate Curated Datasets
 ```powershell
 $env:PYTHONPATH = "src"
