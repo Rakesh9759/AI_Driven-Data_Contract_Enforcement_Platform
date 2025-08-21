@@ -55,7 +55,7 @@ Expected result:
 - Structured JSON logs printed to stdout
 - "Sample data processed successfully" event emitted with rows_processed
 
-## Run Spark Ingestion Tests (Phase 2, C07)
+## Run Spark Ingestion Tests
 Bronze layer ingestion with Spark Structured Streaming abstraction. Tests validate the streaming job logic without requiring Java/Spark runtime.
 
 ```powershell
@@ -67,14 +67,47 @@ Expected result:
 - 24 tests pass (bronze writer config, writer factory, ingestion metrics, job creation, schema inference, mock Kafka reading, transformations, batch tracking, metrics aggregation)
 - All tests use mocks to avoid Java dependency
 
-## Spark Module Overview (C07)
+## Spark Module Overview 
 - **bronze_writer.py**: Abstract bronze layer writer with LocalJsonlBronzeWriter (mock mode) for local testing and future Delta/Iceberg support
 - **spark_streaming_job.py**: BronzeIngestionJob class with schema inference, transformations, batch processing, and metrics tracking
 - **Design Pattern**: Config-driven architecture (BronzeWriterConfig) with mock/real switch for flexibility
 
-## End-to-End Data Flow (C01-C07)
+## Run Observability Metrics Tests
+Ingestion lag and throughput metrics for SLA tracking. Tests validate lag calculation, percentile computation, and batch throughput aggregation.
+
+```powershell
+$env:PYTHONPATH = "src"
+python -m unittest discover -s src/idprp_ai_data_platform/observability/tests -p "test_*.py" -v
 ```
-Simulator (CDR + metrics) → Drift injection → Kafka producer (mock JSONL) → Spark bronze ingestion
+
+Expected result:
+- 18 tests pass (LatencyBucket, IngestionMetrics creation/serialization, LagTracker record/calculate/violation, IngestionMetricsCollector record/window/emit)
+- All tests validate lag, throughput, and SLA compliance logic
+
+## Observability Module Overview
+- **ingestion_metrics.py**: IngestionMetricsCollector for tracking event lag, batch throughput, and SLA violations
+- **LagTracker**: Maintains lag values, computes p50/p99, tracks SLA violations vs threshold (default 5000ms)
+- **IngestionMetrics**: Time-windowed aggregated metrics (avg/max/p50/p99 lag, events/batches per sec, violation rate)
+- **Integration**: BronzeIngestionJob calls `record_event_ingestion()` per event and `record_batch_completion()` per batch
+
+## SLA Configuration
+Default thresholds set in `src/idprp_ai_data_platform/common/config.py`:
+- Ingestion lag SLA: 5000ms (configurable via `IngestionMetricsCollector(sla_max_lag_ms=...)`
+- Time window: 5 minutes (window_start/window_end passed to `get_metrics_for_window()`)
+
+Example: To get 10-minute window metrics for 2025-08-23 12:00-12:10:
+```python
+from datetime import datetime
+metrics = collector.get_metrics_for_window(
+    datetime(2025, 8, 23, 12, 0, 0),
+    datetime(2025, 8, 23, 12, 10, 0)
+)
+collector.emit_metrics_log(metrics)  # Emits as structured JSON log
+```
+
+## End-to-End Data Flow 
+```
+Simulator (CDR + metrics) → Drift injection → Kafka producer (mock JSONL) → Spark bronze ingestion → Ingestion metrics
 ```
 
 Raw events: `src/idprp_ai_data_platform/config/datasets/simulator_clean_sample.jsonl` (16 rows)

@@ -7,6 +7,7 @@ and writes to bronze layer. Tracks ingestion metrics and SLAs.
 import json
 import logging
 from dataclasses import dataclass
+from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
@@ -19,6 +20,7 @@ from idprp_ai_data_platform.ingestion.spark.bronze_writer import (
     BronzeWriterConfig,
     create_bronze_writer,
 )
+from idprp_ai_data_platform.observability.ingestion_metrics import IngestionMetricsCollector
 
 
 logger = logging.getLogger(__name__)
@@ -39,17 +41,19 @@ class IngestionMetrics:
 class BronzeIngestionJob:
     """Spark Structured Streaming job for bronze layer ingestion."""
 
-    def __init__(self, config: AppConfig, spark: SparkSession):
+    def __init__(self, config: AppConfig, spark: SparkSession, sla_max_lag_ms: float = 5000.0):
         """
         Initialize bronze ingestion job.
 
         Args:
             config: Application configuration
             spark: SparkSession instance
+            sla_max_lag_ms: SLA threshold for ingestion lag (milliseconds)
         """
         self.config = config
         self.spark = spark
         self.metrics_history: list[IngestionMetrics] = []
+        self.metrics_collector = IngestionMetricsCollector(sla_max_lag_ms=sla_max_lag_ms)
 
     def infer_event_schema(self, sample_jsonl_path: str) -> str:
         """
@@ -125,7 +129,7 @@ class BronzeIngestionJob:
             IngestionMetrics with batch results
         """
         batch_label = f"batch_{batch_id}" if batch_id else "ad_hoc"
-        start_time = self.spark.sparkContext.getLocalProperty("spark.timestamp")
+        batch_start = datetime.now(timezone.utc)
 
         try:
             # Read source
@@ -147,6 +151,14 @@ class BronzeIngestionJob:
             write_result = writer.write(df_transformed)
             rows_written = write_result.get("rows_written", 0)
 
+            batch_end = datetime.now(timezone.utc)
+            batch_duration_sec = (batch_end - batch_start).total_seconds()
+
+            # Record batch completion for SLA metrics
+            self.metrics_collector.record_batch_completion(
+                batch_label, batch_start, batch_end, rows_written
+            )
+
             logger.info(
                 json.dumps(
                     {
@@ -154,6 +166,7 @@ class BronzeIngestionJob:
                         "batch_id": batch_label,
                         "rows_read": rows_read,
                         "rows_written": rows_written,
+                        "batch_duration_sec": round(batch_duration_sec, 3),
                         "schema_fields": schema_fields,
                         "source": source_path,
                         "output": write_result.get("output_path", ""),
@@ -164,7 +177,7 @@ class BronzeIngestionJob:
             metrics = IngestionMetrics(
                 rows_read=rows_read,
                 rows_written=rows_written,
-                batch_duration_sec=0.1,  # Placeholder; actual duration tracked by Spark
+                batch_duration_sec=batch_duration_sec,
                 schema_fields=schema_fields,
                 status="success",
             )
@@ -222,3 +235,14 @@ class BronzeIngestionJob:
                 total_rows_read / len(self.metrics_history) if self.metrics_history else 0
             ),
         }
+
+    def emit_sla_metrics(self, window_start: datetime, window_end: datetime) -> None:
+        """
+        Calculate and emit SLA metrics for a time window.
+
+        Args:
+            window_start: Start of time window
+            window_end: End of time window
+        """
+        metrics = self.metrics_collector.get_metrics_for_window(window_start, window_end)
+        self.metrics_collector.emit_metrics_log(metrics)
