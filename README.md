@@ -5,9 +5,6 @@ A production-oriented, incrementally built data reliability platform focused on:
 - anomaly detection
 - AI-assisted root cause analysis
 
-## Phase 0 Scope
-This commit establishes a src-first scaffold, baseline configuration and logging utilities, and project architecture/problem framing documentation.
-
 ## Repository Layout
 ```text
 .
@@ -40,19 +37,33 @@ $env:PYTHONPATH = "src"
 python -m idprp_ai_data_platform.main --sample-data src/idprp_ai_data_platform/config/sample_events.jsonl
 ```
 
-## Generate Simulator Data (Phase 1)
+## Generate Simulator Data
 ```powershell
 $env:PYTHONPATH = "src"
 python -m idprp_ai_data_platform.ingestion.simulators.generate_samples --count 10 --output project_files/generated/simulator_events.jsonl
 ```
 
-## Kafka Producer Integration (Phase 2)
+## Kafka Producer Integration
 ```powershell
 $env:PYTHONPATH = "src"
 python -m idprp_ai_data_platform.ingestion.kafka.produce_from_jsonl --input project_files/generated/simulator_events.jsonl --config src/idprp_ai_data_platform/config/app_config.json --mock-output project_files/generated/kafka_events.jsonl
 ```
 
-## Run Simulator Test Suite (Phase 1)
+## Spark Bronze Ingestion
+Spark Structured Streaming job for bronze layer ingestion. Note: Spark ingestion requires Java. For testing without Java, run the unit tests below.
+
+```powershell
+# Unit tests for Spark ingestion modules
+$env:PYTHONPATH = "src"
+python -m unittest discover -s src/idprp_ai_data_platform/ingestion/spark/tests -p "test_*.py"
+```
+
+Modules:
+- Bronze writer abstraction: `src/idprp_ai_data_platform/ingestion/spark/bronze_writer.py`
+- Streaming job: `src/idprp_ai_data_platform/ingestion/spark/spark_streaming_job.py`
+- Tests: `src/idprp_ai_data_platform/ingestion/spark/tests/`
+
+## Run Simulator Test Suite
 ```powershell
 $env:PYTHONPATH = "src"
 python -m unittest discover -s src/idprp_ai_data_platform/ingestion/simulators/tests -p "test_*.py"
