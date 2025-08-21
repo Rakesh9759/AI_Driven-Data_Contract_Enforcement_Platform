@@ -86,11 +86,16 @@ python -m unittest discover -s idprp_ai_data_platform/contracts/tests -p "test_*
 Contract assets:
 - Definitions: [idprp_ai_data_platform/contracts/definitions/](idprp_ai_data_platform/contracts/definitions/)
 - Loader: [idprp_ai_data_platform/contracts/definitions/loader.py](idprp_ai_data_platform/contracts/definitions/loader.py)
+- Validators: [idprp_ai_data_platform/contracts/validators/](idprp_ai_data_platform/contracts/validators/)
 - Tests: [idprp_ai_data_platform/contracts/tests/](idprp_ai_data_platform/contracts/tests/)
 
 Current sample contracts:
 - [idprp_ai_data_platform/contracts/definitions/cdr_events.yaml](idprp_ai_data_platform/contracts/definitions/cdr_events.yaml)
 - [idprp_ai_data_platform/contracts/definitions/device_metrics.yaml](idprp_ai_data_platform/contracts/definitions/device_metrics.yaml)
+
+Validation coverage now includes:
+- Schema validation: missing fields, nullability, and type mismatches
+- Quality validation: required fields, null thresholds, duplicates, and freshness lag breaches
 
 ## Run Simulator Test Suite
 ```powershell

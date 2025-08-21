@@ -70,7 +70,13 @@ Contract definitions are stored as YAML so schema expectations and governance ru
 - **load_contracts_from_directory**: Loads all YAML contract definitions in a directory keyed by dataset name.
 - **ContractDefinitionError**: Raised for missing files, invalid YAML, missing required keys, empty schema definitions, and invalid rule thresholds.
 
-Initial contract coverage includes `cdr_events` and `device_metrics`, which will be consumed by schema and quality validators in the next commit.
+### Validator Layer
+- **validate_schema**: Checks record presence against contract fields, non-nullable fields, and expected primitive types.
+- **SchemaValidationResult / SchemaViolation**: Typed result objects capturing missing fields, nullability breaks, and type mismatches.
+- **validate_quality_rules**: Enforces required fields, max null ratios, duplicate tolerance, and freshness lag thresholds.
+- **QualityValidationResult / QualityViolation**: Typed result objects capturing field-level quality and freshness violations.
+
+Current contract coverage includes `cdr_events` and `device_metrics`, with validator modules ready for runtime enforcement in the next commit.
 
 ## Design Principles
 - Config-driven behavior over hardcoded runtime values.

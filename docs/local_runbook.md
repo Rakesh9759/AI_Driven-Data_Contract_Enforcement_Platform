@@ -90,12 +90,14 @@ python -m unittest discover -s idprp_ai_data_platform/contracts/tests -p "test_*
 ```
 
 Expected result:
-- 10 tests pass covering valid contract loading, malformed YAML, missing required keys, invalid quality thresholds, invalid freshness rules, and directory loading
+- 20 tests pass covering contract loading plus schema and quality validation behavior
 
 ## Contract Module Overview
 - **contracts/definitions/cdr_events.yaml**: Contract for CDR ingestion events with schema, quality rules, and freshness SLA
 - **contracts/definitions/device_metrics.yaml**: Contract for telemetry metric events with schema and freshness SLA
 - **contracts/definitions/loader.py**: Typed YAML loader producing DataContract, ContractField, QualityRule, and FreshnessRule objects
+- **contracts/validators/schema_validator.py**: Validates field presence, nullability, and primitive types against a loaded contract
+- **contracts/validators/data_quality_validator.py**: Validates required fields, null thresholds, duplicates, and freshness lag against contract rules
 - **common/exceptions.py**: ContractDefinitionError for malformed or missing contracts
 
 ## SLA Configuration
