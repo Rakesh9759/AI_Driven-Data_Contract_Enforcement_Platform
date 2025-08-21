@@ -8,6 +8,10 @@ from idprp_ai_data_platform.contracts.definitions.loader import (
     load_contract_from_yaml,
     load_contracts_from_directory,
 )
+from idprp_ai_data_platform.contracts.enforcement.contract_engine import (
+    ContractEngine,
+    ContractValidationReport,
+)
 from idprp_ai_data_platform.contracts.validators.data_quality_validator import (
     QualityValidationResult,
     QualityViolation,
@@ -21,6 +25,8 @@ from idprp_ai_data_platform.contracts.validators.schema_validator import (
 
 __all__ = [
     "ContractField",
+    "ContractEngine",
+    "ContractValidationReport",
     "DataContract",
     "FreshnessRule",
     "QualityRule",

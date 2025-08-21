@@ -25,7 +25,8 @@ class TestContractLoader(unittest.TestCase):
         self.assertIsInstance(contract, DataContract)
         self.assertEqual(contract.dataset_name, "cdr_events")
         self.assertEqual(contract.version, "v1")
-        self.assertEqual(len(contract.schema), 6)
+        self.assertEqual(contract.source_system, "cdr-simulator")
+        self.assertEqual(len(contract.schema), 8)
         self.assertIsNotNone(contract.freshness)
         self.assertEqual(contract.freshness.max_lag_ms, 5000.0)
 
@@ -35,7 +36,8 @@ class TestContractLoader(unittest.TestCase):
         )
 
         self.assertEqual(contract.dataset_name, "device_metrics")
-        self.assertEqual(len(contract.quality_rules), 2)
+        self.assertEqual(contract.source_system, "metrics-simulator")
+        self.assertEqual(len(contract.quality_rules), 4)
 
     def test_load_contracts_from_directory(self) -> None:
         contracts = load_contracts_from_directory(

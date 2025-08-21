@@ -45,6 +45,7 @@ class DataContract:
     contract_name: str
     version: str
     dataset_name: str
+    source_system: str | None = None
     description: str = ""
     owners: list[str] = field(default_factory=list)
     schema: list[ContractField] = field(default_factory=list)
@@ -165,6 +166,9 @@ def load_contract_from_yaml(file_path: Path) -> DataContract:
         contract_name=str(mapping["contract_name"]),
         version=str(mapping["version"]),
         dataset_name=str(mapping["dataset_name"]),
+        source_system=(
+            str(mapping["source_system"]) if mapping.get("source_system") is not None else None
+        ),
         description=str(mapping.get("description", "")),
         owners=[str(owner) for owner in mapping.get("owners", [])],
         schema=_parse_schema(mapping["schema"]),

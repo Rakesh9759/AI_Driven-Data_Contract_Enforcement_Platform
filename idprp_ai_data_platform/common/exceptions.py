@@ -11,3 +11,7 @@ class ConfigurationError(PlatformError):
 
 class ContractDefinitionError(PlatformError):
     """Raised when contract definitions are missing or malformed."""
+
+
+class ContractValidationError(PlatformError):
+    """Raised when runtime contract enforcement cannot be executed."""

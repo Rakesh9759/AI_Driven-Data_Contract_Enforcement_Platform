@@ -76,7 +76,13 @@ Contract definitions are stored as YAML so schema expectations and governance ru
 - **validate_quality_rules**: Enforces required fields, max null ratios, duplicate tolerance, and freshness lag thresholds.
 - **QualityValidationResult / QualityViolation**: Typed result objects capturing field-level quality and freshness violations.
 
-Current contract coverage includes `cdr_events` and `device_metrics`, with validator modules ready for runtime enforcement in the next commit.
+### Runtime Enforcement Layer
+- **ContractEngine**: Loads all contracts once and applies schema plus quality checks to a dataset batch at runtime.
+- **validate_jsonl_file**: Reads JSONL input, filters mixed-source records by `source_system`, and validates only records that belong to the requested dataset contract.
+- **ContractValidationReport**: Combined runtime report exposing schema violations, quality violations, total violations, and overall pass/fail.
+- **main.py integration**: The bootstrap entry point can run contract enforcement with `--contract-dataset`, `--contracts-dir`, and `--observed-max-lag-ms`.
+
+Current contract coverage includes `cdr_events` and `device_metrics`, with runtime enforcement now available for JSONL-backed dataset validation.
 
 ## Design Principles
 - Config-driven behavior over hardcoded runtime values.

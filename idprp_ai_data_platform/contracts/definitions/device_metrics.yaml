@@ -1,30 +1,44 @@
 contract_name: device_metrics_contract
 version: v1
 dataset_name: device_metrics
+source_system: metrics-simulator
 description: Contract for telemetry metrics emitted by simulated network devices.
 owners:
   - rakeshchandramandava28@gmail.com
 schema:
-  - name: event_id
+  - name: metric_id
     type: string
     nullable: false
-  - name: timestamp
+  - name: source
+    type: string
+    nullable: false
+  - name: event_time
     type: timestamp
     nullable: false
-  - name: device_id
-    type: string
+  - name: throughput_rps
+    type: float
     nullable: false
-  - name: metric_name
-    type: string
+  - name: consumer_lag
+    type: integer
     nullable: false
-  - name: metric_value
+  - name: latency_ms
+    type: integer
+    nullable: false
+  - name: null_ratio
     type: float
     nullable: false
 quality_rules:
-  - field: device_id
+  - field: metric_id
     required: true
     max_null_ratio: 0.0
-  - field: metric_value
+    allow_duplicates: false
+  - field: event_time
+    required: true
+    max_null_ratio: 0.0
+  - field: null_ratio
+    required: true
+    max_null_ratio: 0.0
+  - field: throughput_rps
     required: true
     max_null_ratio: 0.0
 freshness:

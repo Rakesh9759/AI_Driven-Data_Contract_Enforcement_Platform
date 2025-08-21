@@ -90,7 +90,7 @@ python -m unittest discover -s idprp_ai_data_platform/contracts/tests -p "test_*
 ```
 
 Expected result:
-- 20 tests pass covering contract loading plus schema and quality validation behavior
+- 27 tests pass covering contract loading, validators, and runtime enforcement engine behavior
 
 ## Contract Module Overview
 - **contracts/definitions/cdr_events.yaml**: Contract for CDR ingestion events with schema, quality rules, and freshness SLA
@@ -98,7 +98,26 @@ Expected result:
 - **contracts/definitions/loader.py**: Typed YAML loader producing DataContract, ContractField, QualityRule, and FreshnessRule objects
 - **contracts/validators/schema_validator.py**: Validates field presence, nullability, and primitive types against a loaded contract
 - **contracts/validators/data_quality_validator.py**: Validates required fields, null thresholds, duplicates, and freshness lag against contract rules
+- **contracts/enforcement/contract_engine.py**: Runtime engine that loads contracts, filters mixed-source JSONL inputs, and returns a combined enforcement report
 - **common/exceptions.py**: ContractDefinitionError for malformed or missing contracts
+
+## Run Runtime Contract Enforcement
+Validate the mixed clean simulator sample against the CDR contract:
+
+```powershell
+python -m idprp_ai_data_platform.main --sample-data idprp_ai_data_platform/config/datasets/simulator_clean_sample.jsonl --contract-dataset cdr_events --observed-max-lag-ms 1000
+```
+
+Validate the same mixed file against the device metrics contract:
+
+```powershell
+python -m idprp_ai_data_platform.main --sample-data idprp_ai_data_platform/config/datasets/simulator_clean_sample.jsonl --contract-dataset device_metrics --observed-max-lag-ms 1000
+```
+
+Expected result:
+- `Sample data processed successfully` log is emitted first
+- `Contract validation completed` log is emitted with `contract_validation_passed=true`
+- Mixed-source files are filtered automatically using `source_system` from the selected contract
 
 ## SLA Configuration
 Default thresholds set in [idprp_ai_data_platform/common/config.py](../idprp_ai_data_platform/common/config.py):

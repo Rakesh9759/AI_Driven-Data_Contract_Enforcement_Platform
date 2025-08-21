@@ -1,6 +1,7 @@
 contract_name: cdr_events_contract
 version: v1
 dataset_name: cdr_events
+source_system: cdr-simulator
 description: Contract for call detail record events used in bronze ingestion.
 owners:
   - rakeshchandramandava28@gmail.com
@@ -9,26 +10,32 @@ schema:
     type: string
     nullable: false
     description: Unique event identifier.
-  - name: event_type
+  - name: source
     type: string
     nullable: false
-  - name: timestamp
+  - name: event_time
     type: timestamp
     nullable: false
   - name: caller_id
     type: string
     nullable: false
-  - name: receiver_id
+  - name: callee_id
     type: string
     nullable: false
   - name: duration_sec
     type: integer
     nullable: false
+  - name: network_type
+    type: string
+    nullable: false
+  - name: status
+    type: string
+    nullable: false
 quality_rules:
   - field: event_id
     required: true
     allow_duplicates: false
-  - field: timestamp
+  - field: event_time
     required: true
     max_null_ratio: 0.0
   - field: duration_sec

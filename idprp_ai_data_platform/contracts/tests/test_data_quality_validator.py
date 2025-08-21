@@ -20,20 +20,24 @@ class TestDataQualityValidator(unittest.TestCase):
         )
         self.valid_records = [
             {
-                "event_id": "evt-1",
-                "event_type": "call_start",
-                "timestamp": "2025-08-23T12:00:00Z",
+                "event_id": "cdr-00001",
+                "source": "cdr-simulator",
+                "event_time": "2025-08-23T12:00:00Z",
                 "caller_id": "user-a",
-                "receiver_id": "user-b",
+                "callee_id": "user-b",
                 "duration_sec": 120,
+                "network_type": "5g",
+                "status": "ok",
             },
             {
-                "event_id": "evt-2",
-                "event_type": "call_end",
-                "timestamp": "2025-08-23T12:01:00Z",
+                "event_id": "cdr-00002",
+                "source": "cdr-simulator",
+                "event_time": "2025-08-23T12:01:00Z",
                 "caller_id": "user-a",
-                "receiver_id": "user-b",
+                "callee_id": "user-b",
                 "duration_sec": 98,
+                "network_type": "lte",
+                "status": "warn",
             },
         ]
 
@@ -43,7 +47,7 @@ class TestDataQualityValidator(unittest.TestCase):
 
     def test_required_rule_fails_for_nulls(self) -> None:
         records = [dict(self.valid_records[0]), dict(self.valid_records[1])]
-        records[0]["timestamp"] = None
+        records[0]["event_time"] = None
 
         result = validate_quality_rules(records, self.contract)
 
@@ -61,7 +65,7 @@ class TestDataQualityValidator(unittest.TestCase):
 
     def test_duplicate_rule_fails(self) -> None:
         records = [dict(self.valid_records[0]), dict(self.valid_records[1])]
-        records[1]["event_id"] = "evt-1"
+        records[1]["event_id"] = "cdr-00001"
 
         result = validate_quality_rules(records, self.contract)
 

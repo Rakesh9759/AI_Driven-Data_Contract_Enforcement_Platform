@@ -17,12 +17,14 @@ class TestSchemaValidator(unittest.TestCase):
             Path("idprp_ai_data_platform/contracts/definitions/cdr_events.yaml")
         )
         self.valid_record = {
-            "event_id": "evt-1",
-            "event_type": "call_start",
-            "timestamp": "2025-08-23T12:00:00Z",
+            "event_id": "cdr-00001",
+            "source": "cdr-simulator",
+            "event_time": "2025-08-23T12:00:00Z",
             "caller_id": "user-a",
-            "receiver_id": "user-b",
+            "callee_id": "user-b",
             "duration_sec": 120,
+            "network_type": "5g",
+            "status": "ok",
         }
 
     def test_valid_schema_passes(self) -> None:
@@ -32,7 +34,7 @@ class TestSchemaValidator(unittest.TestCase):
 
     def test_missing_field_fails(self) -> None:
         invalid_record = dict(self.valid_record)
-        invalid_record.pop("receiver_id")
+        invalid_record.pop("callee_id")
 
         result = validate_schema([invalid_record], self.contract)
 
@@ -61,6 +63,7 @@ class TestSchemaValidator(unittest.TestCase):
         invalid_record_one = dict(self.valid_record)
         invalid_record_one.pop("caller_id")
         invalid_record_two = dict(self.valid_record)
+        invalid_record_two["status"] = None
         invalid_record_two["duration_sec"] = None
 
         result = validate_schema(
@@ -68,4 +71,4 @@ class TestSchemaValidator(unittest.TestCase):
             self.contract,
         )
 
-        self.assertEqual(len(result.violations), 2)
+        self.assertEqual(len(result.violations), 3)

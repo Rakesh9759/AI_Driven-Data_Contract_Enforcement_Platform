@@ -97,6 +97,16 @@ Validation coverage now includes:
 - Schema validation: missing fields, nullability, and type mismatches
 - Quality validation: required fields, null thresholds, duplicates, and freshness lag breaches
 
+Runtime enforcement is available through the platform entry point:
+
+```powershell
+python -m idprp_ai_data_platform.main --sample-data idprp_ai_data_platform/config/datasets/simulator_clean_sample.jsonl --contract-dataset cdr_events --observed-max-lag-ms 1000
+```
+
+Runtime enforcement assets:
+- Engine: [idprp_ai_data_platform/contracts/enforcement/contract_engine.py](idprp_ai_data_platform/contracts/enforcement/contract_engine.py)
+- Contract-aware CLI: [idprp_ai_data_platform/main.py](idprp_ai_data_platform/main.py)
+
 ## Run Simulator Test Suite
 ```powershell
 python -m unittest discover -s idprp_ai_data_platform/ingestion/simulators/tests -p "test_*.py"

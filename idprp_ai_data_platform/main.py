@@ -9,8 +9,12 @@ import os
 from pathlib import Path
 
 from idprp_ai_data_platform.common.config import AppConfig
-from idprp_ai_data_platform.common.exceptions import ConfigurationError
+from idprp_ai_data_platform.common.exceptions import (
+    ConfigurationError,
+    ContractValidationError,
+)
 from idprp_ai_data_platform.common.logging_utils import setup_logging
+from idprp_ai_data_platform.contracts.enforcement.contract_engine import ContractEngine
 
 
 def _parse_args(argv: list[str] | None = None) -> argparse.Namespace:
@@ -26,6 +30,24 @@ def _parse_args(argv: list[str] | None = None) -> argparse.Namespace:
         type=Path,
         default=None,
         help="Optional JSONL file to parse for bootstrap smoke validation.",
+    )
+    parser.add_argument(
+        "--contract-dataset",
+        type=str,
+        default=None,
+        help="Optional dataset name to validate with the runtime contract engine.",
+    )
+    parser.add_argument(
+        "--contracts-dir",
+        type=Path,
+        default=None,
+        help="Optional contracts directory. Defaults to the built-in contracts definitions path.",
+    )
+    parser.add_argument(
+        "--observed-max-lag-ms",
+        type=float,
+        default=None,
+        help="Optional observed max lag for freshness validation during contract enforcement.",
     )
     return parser.parse_args(argv)
 
@@ -70,6 +92,42 @@ def _process_sample_data(sample_data_path: Path) -> int:
     return processed_rows
 
 
+def _run_contract_validation(
+    sample_data_path: Path,
+    dataset_name: str,
+    contracts_dir: Path | None,
+    observed_max_lag_ms: float | None,
+) -> None:
+    logger = logging.getLogger("platform.bootstrap")
+    engine = (
+        ContractEngine(contracts_dir)
+        if contracts_dir is not None
+        else ContractEngine.from_default_directory()
+    )
+    report = engine.validate_jsonl_file(
+        dataset_name,
+        sample_data_path,
+        observed_max_lag_ms=observed_max_lag_ms,
+    )
+
+    logger.info(
+        "Contract validation completed",
+        extra={
+            "dataset_name": dataset_name,
+            "sample_data_path": str(sample_data_path),
+            "schema_violations": len(report.schema_result.violations),
+            "quality_violations": len(report.quality_result.violations),
+            "total_violations": report.total_violations,
+            "contract_validation_passed": report.is_valid,
+        },
+    )
+
+    if not report.is_valid:
+        raise ContractValidationError(
+            f"Contract validation failed for dataset {dataset_name} with {report.total_violations} violations"
+        )
+
+
 def main(argv: list[str] | None = None) -> int:
     args = _parse_args(argv)
     config_path = _resolve_config_path(args.config)
@@ -99,8 +157,18 @@ def main(argv: list[str] | None = None) -> int:
     if args.sample_data is not None:
         try:
             _process_sample_data(args.sample_data)
+            if args.contract_dataset is not None:
+                _run_contract_validation(
+                    args.sample_data,
+                    args.contract_dataset,
+                    args.contracts_dir,
+                    args.observed_max_lag_ms,
+                )
         except ConfigurationError as exc:
             logger.exception("Bootstrap validation failed: %s", exc)
+            return 1
+        except ContractValidationError as exc:
+            logger.exception("Contract enforcement failed: %s", exc)
             return 1
 
     return 0
