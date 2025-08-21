@@ -13,6 +13,7 @@ Build an incremental, production-grade data reliability platform with clear modu
 ## Baseline Module Layout
 - idprp_ai_data_platform/common: shared config, logging, and exception utilities.
 - idprp_ai_data_platform/config: environment-driven runtime configuration.
+- idprp_ai_data_platform/contracts: YAML contract definitions and typed loading utilities.
 - idprp_ai_data_platform/ingestion/simulators: CDR, metrics, and drift simulators for data generation.
 - idprp_ai_data_platform/ingestion/kafka: Kafka producer abstraction with mock JSONL output.
 - idprp_ai_data_platform/ingestion/spark: Spark Structured Streaming for bronze layer ingestion.
@@ -52,6 +53,24 @@ Integration:
 - For each ingested batch, job calls record_batch_completion(batch_id, batch_start, batch_end, event_count).
 - Metrics retrieved via get_metrics_for_window(window_start, window_end) returning IngestionMetrics.
 - Structured logs emitted via emit_metrics_log(metrics) with p50/p99 lag percentiles.
+
+## Contract Definitions
+
+### YAML Contract Layer
+Contract definitions are stored as YAML so schema expectations and governance rules remain declarative and versionable.
+
+### Contract Model
+- **DataContract**: Root contract object containing dataset name, version, owners, schema, quality rules, and freshness requirements.
+- **ContractField**: Field-level schema definition with name, type, nullability, and description.
+- **QualityRule**: Field-level data quality expectations, including required fields, null thresholds, and duplicate tolerance.
+- **FreshnessRule**: Dataset-level freshness expectation expressed as maximum ingestion lag in milliseconds.
+
+### Loading and Validation
+- **load_contract_from_yaml**: Parses one YAML contract file into a typed DataContract.
+- **load_contracts_from_directory**: Loads all YAML contract definitions in a directory keyed by dataset name.
+- **ContractDefinitionError**: Raised for missing files, invalid YAML, missing required keys, empty schema definitions, and invalid rule thresholds.
+
+Initial contract coverage includes `cdr_events` and `device_metrics`, which will be consumed by schema and quality validators in the next commit.
 
 ## Design Principles
 - Config-driven behavior over hardcoded runtime values.

@@ -1,0 +1,31 @@
+contract_name: device_metrics_contract
+version: v1
+dataset_name: device_metrics
+description: Contract for telemetry metrics emitted by simulated network devices.
+owners:
+  - rakeshchandramandava28@gmail.com
+schema:
+  - name: event_id
+    type: string
+    nullable: false
+  - name: timestamp
+    type: timestamp
+    nullable: false
+  - name: device_id
+    type: string
+    nullable: false
+  - name: metric_name
+    type: string
+    nullable: false
+  - name: metric_value
+    type: float
+    nullable: false
+quality_rules:
+  - field: device_id
+    required: true
+    max_null_ratio: 0.0
+  - field: metric_value
+    required: true
+    max_null_ratio: 0.0
+freshness:
+  max_lag_ms: 3000

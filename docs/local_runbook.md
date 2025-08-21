@@ -82,8 +82,24 @@ Expected result:
 - **IngestionMetrics**: Time-windowed aggregated metrics (avg/max/p50/p99 lag, events/batches per sec, violation rate)
 - **Integration**: BronzeIngestionJob calls `record_event_ingestion()` per event and `record_batch_completion()` per batch
 
+## Run Contract Definition Tests
+YAML-backed contract definitions validate dataset schema, quality rules, and freshness thresholds before runtime enforcement is introduced.
+
+```powershell
+python -m unittest discover -s idprp_ai_data_platform/contracts/tests -p "test_*.py" -v
+```
+
+Expected result:
+- 10 tests pass covering valid contract loading, malformed YAML, missing required keys, invalid quality thresholds, invalid freshness rules, and directory loading
+
+## Contract Module Overview
+- **contracts/definitions/cdr_events.yaml**: Contract for CDR ingestion events with schema, quality rules, and freshness SLA
+- **contracts/definitions/device_metrics.yaml**: Contract for telemetry metric events with schema and freshness SLA
+- **contracts/definitions/loader.py**: Typed YAML loader producing DataContract, ContractField, QualityRule, and FreshnessRule objects
+- **common/exceptions.py**: ContractDefinitionError for malformed or missing contracts
+
 ## SLA Configuration
-Default thresholds set in [idprp_ai_data_platform/common/config.py](../../idprp_ai_data_platform/common/config.py):
+Default thresholds set in [idprp_ai_data_platform/common/config.py](../idprp_ai_data_platform/common/config.py):
 - Ingestion lag SLA: 5000ms (configurable via `IngestionMetricsCollector(sla_max_lag_ms=...)`
 - Time window: 5 minutes (window_start/window_end passed to `get_metrics_for_window()`)
 
@@ -102,6 +118,5 @@ collector.emit_metrics_log(metrics)  # Emits as structured JSON log
 Simulator (CDR + metrics) → Drift injection → Kafka producer (mock JSONL) → Spark bronze ingestion → Ingestion metrics
 ```
 
-Raw events: `src/idprp_ai_data_platform/config/datasets/simulator_clean_sample.jsonl` (16 rows)
-Raw events: [idprp_ai_data_platform/config/datasets/simulator_clean_sample.jsonl](../../idprp_ai_data_platform/config/datasets/simulator_clean_sample.jsonl) (16 rows)
-Drifted events: [idprp_ai_data_platform/config/datasets/simulator_drifted_sample.jsonl](../../idprp_ai_data_platform/config/datasets/simulator_drifted_sample.jsonl) (20 rows)
+Raw events: [idprp_ai_data_platform/config/datasets/simulator_clean_sample.jsonl](../idprp_ai_data_platform/config/datasets/simulator_clean_sample.jsonl) (16 rows)
+Drifted events: [idprp_ai_data_platform/config/datasets/simulator_drifted_sample.jsonl](../idprp_ai_data_platform/config/datasets/simulator_drifted_sample.jsonl) (20 rows)

@@ -12,12 +12,13 @@ A production-oriented, incrementally built data reliability platform focused on:
 |   |-- architecture.md
 |   |-- local_runbook.md
 |   `-- problem_statement.md
-|-- src/
-|   `-- idprp_ai_data_platform/
-|       |-- common/
-|       |-- config/
-|       |-- ingestion/
-|       `-- main.py
+|-- idprp_ai_data_platform/
+|   |-- common/
+|   |-- config/
+|   |-- contracts/
+|   |-- ingestion/
+|   |-- observability/
+|   `-- main.py
 `-- README.md
 ```
 
@@ -74,6 +75,22 @@ Key metrics tracked:
 Module:
 - Metrics collection: [idprp_ai_data_platform/observability/ingestion_metrics.py](idprp_ai_data_platform/observability/ingestion_metrics.py)
 - Tests: [idprp_ai_data_platform/observability/tests/](idprp_ai_data_platform/observability/tests/)
+
+## Data Contracts
+YAML-backed dataset contracts define the expected schema, field quality rules, and freshness thresholds for streaming datasets.
+
+```powershell
+python -m unittest discover -s idprp_ai_data_platform/contracts/tests -p "test_*.py"
+```
+
+Contract assets:
+- Definitions: [idprp_ai_data_platform/contracts/definitions/](idprp_ai_data_platform/contracts/definitions/)
+- Loader: [idprp_ai_data_platform/contracts/definitions/loader.py](idprp_ai_data_platform/contracts/definitions/loader.py)
+- Tests: [idprp_ai_data_platform/contracts/tests/](idprp_ai_data_platform/contracts/tests/)
+
+Current sample contracts:
+- [idprp_ai_data_platform/contracts/definitions/cdr_events.yaml](idprp_ai_data_platform/contracts/definitions/cdr_events.yaml)
+- [idprp_ai_data_platform/contracts/definitions/device_metrics.yaml](idprp_ai_data_platform/contracts/definitions/device_metrics.yaml)
 
 ## Run Simulator Test Suite
 ```powershell
