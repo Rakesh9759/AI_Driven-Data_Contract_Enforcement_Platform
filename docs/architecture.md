@@ -11,12 +11,12 @@ Build an incremental, production-grade data reliability platform with clear modu
 5. AI modules generate root cause guidance and contract evolution suggestions.
 
 ## Baseline Module Layout
-- src/idprp_ai_data_platform/common: shared config, logging, and exception utilities.
-- src/idprp_ai_data_platform/config: environment-driven runtime configuration.
-- src/idprp_ai_data_platform/ingestion/simulators: CDR, metrics, and drift simulators for data generation.
-- src/idprp_ai_data_platform/ingestion/kafka: Kafka producer abstraction with mock JSONL output.
-- src/idprp_ai_data_platform/ingestion/spark: Spark Structured Streaming for bronze layer ingestion.
-- src/idprp_ai_data_platform/observability: Ingestion metrics tracking (lag, throughput, SLA compliance).
+- idprp_ai_data_platform/common: shared config, logging, and exception utilities.
+- idprp_ai_data_platform/config: environment-driven runtime configuration.
+- idprp_ai_data_platform/ingestion/simulators: CDR, metrics, and drift simulators for data generation.
+- idprp_ai_data_platform/ingestion/kafka: Kafka producer abstraction with mock JSONL output.
+- idprp_ai_data_platform/ingestion/spark: Spark Structured Streaming for bronze layer ingestion.
+- idprp_ai_data_platform/observability: Ingestion metrics tracking (lag, throughput, SLA compliance).
 - docs: architecture and problem framing docs tracked as part of Phase 0.
 
 ## Streaming Ingestion Layer

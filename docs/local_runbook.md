@@ -6,7 +6,6 @@
 
 ## Bootstrapping
 ```powershell
-$env:PYTHONPATH = "src"
 python -m idprp_ai_data_platform.main
 ```
 
@@ -20,35 +19,30 @@ python -m idprp_ai_data_platform.main
 
 ## Smoke Validation With Sample Data
 ```powershell
-$env:PYTHONPATH = "src"
-python -m idprp_ai_data_platform.main --sample-data src/idprp_ai_data_platform/config/sample_events.jsonl
+python -m idprp_ai_data_platform.main --sample-data idprp_ai_data_platform/config/sample_events.jsonl
 ```
 
 ## Generate Synthetic Events For Local Testing
 ```powershell
-$env:PYTHONPATH = "src"
 python -m idprp_ai_data_platform.ingestion.simulators.generate_samples --count 10 --output project_files/generated/simulator_events.jsonl
 python -m idprp_ai_data_platform.main --sample-data project_files/generated/simulator_events.jsonl
 ```
 
 ## Run Simulator Tests
 ```powershell
-$env:PYTHONPATH = "src"
-python -m unittest discover -s src/idprp_ai_data_platform/ingestion/simulators/tests -p "test_*.py"
+python -m unittest discover -s idprp_ai_data_platform/ingestion/simulators/tests -p "test_*.py"
 ```
 
 ## Publish Events Through Kafka Producer Adapter
 ```powershell
-$env:PYTHONPATH = "src"
 python -m idprp_ai_data_platform.ingestion.simulators.generate_samples --count 12 --output project_files/generated/simulator_events_phase2.jsonl
-python -m idprp_ai_data_platform.ingestion.kafka.produce_from_jsonl --input project_files/generated/simulator_events_phase2.jsonl --config src/idprp_ai_data_platform/config/app_config.json --mock-output project_files/generated/kafka_events_phase2.jsonl
+python -m idprp_ai_data_platform.ingestion.kafka.produce_from_jsonl --input project_files/generated/simulator_events_phase2.jsonl --config idprp_ai_data_platform/config/app_config.json --mock-output project_files/generated/kafka_events_phase2.jsonl
 ```
 
 ## Validate Curated Datasets
 ```powershell
-$env:PYTHONPATH = "src"
-python -m idprp_ai_data_platform.main --sample-data src/idprp_ai_data_platform/config/datasets/simulator_clean_sample.jsonl
-python -m idprp_ai_data_platform.main --sample-data src/idprp_ai_data_platform/config/datasets/simulator_drifted_sample.jsonl
+python -m idprp_ai_data_platform.main --sample-data idprp_ai_data_platform/config/datasets/simulator_clean_sample.jsonl
+python -m idprp_ai_data_platform.main --sample-data idprp_ai_data_platform/config/datasets/simulator_drifted_sample.jsonl
 ```
 
 Expected result:
@@ -59,8 +53,7 @@ Expected result:
 Bronze layer ingestion with Spark Structured Streaming abstraction. Tests validate the streaming job logic without requiring Java/Spark runtime.
 
 ```powershell
-$env:PYTHONPATH = "src"
-python -m unittest discover -s src/idprp_ai_data_platform/ingestion/spark/tests -p "test_*.py" -v
+python -m unittest discover -s idprp_ai_data_platform/ingestion/spark/tests -p "test_*.py" -v
 ```
 
 Expected result:
@@ -76,8 +69,7 @@ Expected result:
 Ingestion lag and throughput metrics for SLA tracking. Tests validate lag calculation, percentile computation, and batch throughput aggregation.
 
 ```powershell
-$env:PYTHONPATH = "src"
-python -m unittest discover -s src/idprp_ai_data_platform/observability/tests -p "test_*.py" -v
+python -m unittest discover -s idprp_ai_data_platform/observability/tests -p "test_*.py" -v
 ```
 
 Expected result:
@@ -91,7 +83,7 @@ Expected result:
 - **Integration**: BronzeIngestionJob calls `record_event_ingestion()` per event and `record_batch_completion()` per batch
 
 ## SLA Configuration
-Default thresholds set in `src/idprp_ai_data_platform/common/config.py`:
+Default thresholds set in [idprp_ai_data_platform/common/config.py](../../idprp_ai_data_platform/common/config.py):
 - Ingestion lag SLA: 5000ms (configurable via `IngestionMetricsCollector(sla_max_lag_ms=...)`
 - Time window: 5 minutes (window_start/window_end passed to `get_metrics_for_window()`)
 
@@ -111,4 +103,5 @@ Simulator (CDR + metrics) → Drift injection → Kafka producer (mock JSONL) �
 ```
 
 Raw events: `src/idprp_ai_data_platform/config/datasets/simulator_clean_sample.jsonl` (16 rows)
-Drifted events: `src/idprp_ai_data_platform/config/datasets/simulator_drifted_sample.jsonl` (20 rows)
+Raw events: [idprp_ai_data_platform/config/datasets/simulator_clean_sample.jsonl](../../idprp_ai_data_platform/config/datasets/simulator_clean_sample.jsonl) (16 rows)
+Drifted events: [idprp_ai_data_platform/config/datasets/simulator_drifted_sample.jsonl](../../idprp_ai_data_platform/config/datasets/simulator_drifted_sample.jsonl) (20 rows)
